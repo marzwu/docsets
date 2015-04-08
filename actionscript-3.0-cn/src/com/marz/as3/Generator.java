@@ -15,22 +15,22 @@ public class Generator {
 		
 		Connection connection = null;
 		try {
+			File dbFile = new File("actionscript-3.0-cn.docset/Contents/Resources/docSet.dsidx");
+			if(dbFile.exists()){
+				dbFile.delete();
+			}
+			
 			// create a database connection
 			connection = DriverManager.getConnection("jdbc:sqlite:actionscript-3.0-cn.docset/Contents/Resources/docSet.dsidx");
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30); // set timeout to 30 sec.
+			
+			statement.executeUpdate("CREATE TABLE searchIndex(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT)");
+			statement.executeUpdate("CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path)");
 
-			statement.executeUpdate("drop table if exists person");
-			statement
-					.executeUpdate("create table person (id integer, name string)");
-			statement.executeUpdate("insert into person values(1, 'leo')");
-			statement.executeUpdate("insert into person values(2, 'yui')");
-			ResultSet rs = statement.executeQuery("select * from person");
-			while (rs.next()) {
-				// read the result set
-				System.out.println("name = " + rs.getString("name"));
-				System.out.println("id = " + rs.getInt("id"));
-			}
+			statement.executeUpdate("INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (\"$name\",\"$class\",\"$href\")");
+			statement.executeUpdate("INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (\"$name\",\"Function\",\"$href\")");
+			
 		} catch (SQLException e) {
 			// if the error message is "out of memory",
 			// it probably means no database file is found
