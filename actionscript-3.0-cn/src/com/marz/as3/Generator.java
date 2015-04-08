@@ -3,9 +3,13 @@ package com.marz.as3;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import com.sun.webkit.dom.HTMLDocumentImpl;
 
 public class Generator {
 
@@ -31,6 +35,8 @@ public class Generator {
 			statement.executeUpdate("INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (\"$name\",\"$class\",\"$href\")");
 			statement.executeUpdate("INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (\"$name\",\"Function\",\"$href\")");
 			
+//			Document dom = new HTMLDocumentImpl();
+//			Element element = dom.getDocumentElement();
 		} catch (SQLException e) {
 			// if the error message is "out of memory",
 			// it probably means no database file is found
