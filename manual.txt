@@ -1,0 +1,14 @@
+actionscript-3.0-cn.docset/Contents/Resources/Documents/
+
+<entry>
+    <version>17.0</version>
+    <url>http://localhost:9090/docsets/actionscript-3.0-cn.tgz</url>
+</entry>
+
+actionscript-3.0-cn.docset/Contents/Resources/docSet.dsidx
+jdbc:sqlite:actionscript-3.0-cn.docset/Contents/Resources/docSet.dsidx
+
+CREATE TABLE searchIndex(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT)
+CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path)
+INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (\"$name\",\"$class\",\"$href\")
+INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (\"$name\",\"Function\",\"$href\")
