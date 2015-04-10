@@ -50,14 +50,19 @@ public class Generator {
 				while (iterator.hasNext()) {
 					Element next = iterator.next();
 					if (next.attr("name").equals("ftr")) {
+						System.out.println(next.attr("title"));
+						
 						String url = next.attr("title");
 						url = url.replace('.', '/');
 						url += ".html";
+						
+						String name = next.childNode(0).toString().replace("&nbsp;", " ").trim();
+
 						statement
 								.executeUpdate(String
 										.format("INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (\"%s\",\"Class\",\"%s\")",
-												next.attr("value"),
-												/*next.attr("title"), */url));
+												name,
+												/* next.attr("title"), */url));
 					}
 				}
 			} catch (IOException e) {
