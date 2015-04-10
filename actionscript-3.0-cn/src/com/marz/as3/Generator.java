@@ -1,9 +1,12 @@
 package com.marz.as3;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
@@ -39,34 +42,30 @@ public class Generator {
 			statement
 					.executeUpdate("CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path)");
 
-			File input = new File(pathStr + "all-classes.html");
-			try {
-				Document doc = Jsoup.parse(input, "UTF-8",
-						"http://example.com/");
+			parseClasses(pathStr, statement);
 
-				Elements elements = doc.select("a[href]");
+			//
+			ResultSet rs = statement
+					.executeQuery("select path from searchIndex");
 
-				Iterator<Element> iterator = elements.iterator();
-				while (iterator.hasNext()) {
-					Element next = iterator.next();
-					if (next.attr("name").equals("ftr")) {
-						System.out.println(next.attr("title"));
-						
-						String url = next.attr("title");
-						url = url.replace('.', '/');
-						url += ".html";
-						
-						String name = next.childNode(0).toString().replace("&nbsp;", " ").trim();
-
-						statement
-								.executeUpdate(String
-										.format("INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (\"%s\",\"Class\",\"%s\")",
-												name,
-												/* next.attr("title"), */url));
-					}
+			while (rs.next()) {
+				String url = rs.getString("path");
+				File input = new File(pathStr + url);
+				try {
+					Document doc = Jsoup.parse(input, "UTF-8",
+							"http://example.com/");
+					Elements mainright = doc.select("div.mainright");
+					doc.select("table.titleTable").remove();
+					doc.select("div.maincontainer").remove();
+//					doc.empty();
+					doc.append(mainright.toString());
+					
+					FileWriter fw = new FileWriter(pathStr + url, false);
+					fw.write(doc.toString());
+					fw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 
 			// statement
@@ -88,6 +87,38 @@ public class Generator {
 				// connection close failed.
 				System.err.println(e);
 			}
+		}
+	}
+
+	private static void parseClasses(String pathStr, Statement statement)
+			throws SQLException {
+		File input = new File(pathStr + "all-classes.html");
+		try {
+			Document doc = Jsoup.parse(input, "UTF-8", "http://example.com/");
+
+			Elements elements = doc.select("a[href]");
+
+			Iterator<Element> iterator = elements.iterator();
+			while (iterator.hasNext()) {
+				Element next = iterator.next();
+				if (next.attr("name").equals("ftr")) {
+//					System.out.println(next.attr("title"));
+
+					String url = next.attr("title");
+					url = url.replace('.', '/');
+					url += ".html";
+
+					String name = next.text().replace("\u00a0", "").trim();
+
+					statement
+							.executeUpdate(String
+									.format("INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (\"%s\",\"Class\",\"%s\")",
+											name,
+											/* next.attr("title"), */url));
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
