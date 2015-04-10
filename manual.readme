@@ -12,3 +12,5 @@ CREATE TABLE searchIndex(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT
 CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path)
 INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (\"$name\",\"$class\",\"$href\")
 INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (\"$name\",\"Function\",\"$href\")
+
+tar --exclude='.DS_Store' -cvzf <docset name>.tgz <docset name>.docset
