@@ -58,7 +58,7 @@ public class Generator {
 					doc.select("table.titleTable").remove();
 					doc.select("div.maincontainer").remove();
 //					doc.empty();
-					doc.append(mainright.toString());
+					doc.body().append(mainright.toString());
 					
 					FileWriter fw = new FileWriter(pathStr + url, false);
 					fw.write(doc.toString());
