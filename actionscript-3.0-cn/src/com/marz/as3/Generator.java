@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.jsoup.Jsoup;
@@ -46,7 +47,9 @@ public class Generator {
 
 			//
 			ResultSet rs = statement
-					.executeQuery("select path from searchIndex");
+					.executeQuery("select path from searchIndex where type = \"Class\"");
+
+			ArrayList<String[]> links = new ArrayList<String[]>();
 
 			while (rs.next()) {
 				String url = rs.getString("path");
@@ -75,9 +78,35 @@ public class Generator {
 					FileWriter fw = new FileWriter(pathStr + url, false);
 					fw.write(doc.toString());
 					fw.close();
+
+					Elements elements = mainright.select("a.signatureLink");
+					Iterator<Element> iterator = elements.iterator();
+					while (iterator.hasNext()) {
+						Element next = iterator.next();
+						String link = next.attr("href");
+						int prefixIndex = link.lastIndexOf("../");
+						if (prefixIndex > -1) {
+							link = link.substring(prefixIndex + 3);
+						}
+						String name = link.substring(link.indexOf("#") + 1);
+						String type = name.indexOf("()") > -1 ? "Method"
+								: "Property";
+
+						links.add(new String[] { name, type, link });
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+			}
+			rs.close();
+
+			Iterator<String[]> iterator = links.iterator();
+			while (iterator.hasNext()) {
+				String[] next = iterator.next();
+				statement
+						.executeUpdate(String
+								.format("INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (\"%s\",\"%s\",\"%s\")",
+										next[0], next[1], next[2]));
 			}
 
 			// statement
