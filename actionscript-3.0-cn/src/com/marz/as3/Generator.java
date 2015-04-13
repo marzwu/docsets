@@ -61,7 +61,14 @@ public class Generator {
 					// doc.empty();
 
 					mainright.select("tr.showHideLinks").remove();
+					mainright.select("div.showHideLinks").remove();
+					// mainright.select("tr.hideInheritedProperty").attr("class",
+					// "");
 					mainright.select("tr.hideInheritedProperty").attr("class",
+							"");
+					mainright.select("tr.hideInheritedMethod")
+							.attr("class", "");
+					mainright.select("tr[class^=hideInherited]").attr("class",
 							"");
 					doc.body().append(mainright.toString());
 
