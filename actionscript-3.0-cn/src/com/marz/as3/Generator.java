@@ -57,9 +57,14 @@ public class Generator {
 					Elements mainright = doc.select("div.mainright");
 					doc.select("table.titleTable").remove();
 					doc.select("div.maincontainer").remove();
-//					doc.empty();
+					mainright.remove();
+					// doc.empty();
+
+					mainright.select("tr.showHideLinks").remove();
+					mainright.select("tr.hideInheritedProperty").attr("class",
+							"");
 					doc.body().append(mainright.toString());
-					
+
 					FileWriter fw = new FileWriter(pathStr + url, false);
 					fw.write(doc.toString());
 					fw.close();
@@ -102,7 +107,7 @@ public class Generator {
 			while (iterator.hasNext()) {
 				Element next = iterator.next();
 				if (next.attr("name").equals("ftr")) {
-//					System.out.println(next.attr("title"));
+					// System.out.println(next.attr("title"));
 
 					String url = next.attr("title");
 					url = url.replace('.', '/');
