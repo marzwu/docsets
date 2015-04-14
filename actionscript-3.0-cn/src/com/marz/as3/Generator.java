@@ -1,6 +1,5 @@
 package com.marz.as3;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -49,10 +48,16 @@ public class Generator {
 			ResultSet rs = statement
 					.executeQuery("select path from searchIndex where type = \"Class\"");
 
-			ArrayList<String[]> links = new ArrayList<String[]>();
-
+			ArrayList<String> pathes = new ArrayList<String>();
 			while (rs.next()) {
-				String url = rs.getString("path");
+				pathes.add(rs.getString("path"));
+			}
+			rs.close();
+
+			Iterator<String> pathIterator = pathes.iterator();
+
+			while (pathIterator.hasNext()) {
+				String url = pathIterator.next();
 				File input = new File(pathStr + url);
 				try {
 					Document doc = Jsoup.parse(input, "UTF-8",
@@ -92,21 +97,14 @@ public class Generator {
 						String type = name.indexOf("()") > -1 ? "Method"
 								: "Property";
 
-						links.add(new String[] { name, type, link });
+						statement
+								.executeUpdate(String
+										.format("INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (\"%s\",\"%s\",\"%s\")",
+												name, type, link));
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			}
-			rs.close();
-
-			Iterator<String[]> iterator = links.iterator();
-			while (iterator.hasNext()) {
-				String[] next = iterator.next();
-				statement
-						.executeUpdate(String
-								.format("INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (\"%s\",\"%s\",\"%s\")",
-										next[0], next[1], next[2]));
 			}
 
 			// statement
